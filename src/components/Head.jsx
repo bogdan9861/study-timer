@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
 
   header_logo: {
     position: 'absolute',
-    left: '12%',
+    left: '15%',
     top: '25%'
   }
 })

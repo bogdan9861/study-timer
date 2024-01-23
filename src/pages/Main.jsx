@@ -1,7 +1,7 @@
 import Head from "../components/Head";
 import Clock from "../components/Clock";
-import Schedules from "../components/Schedules";
 import Indicator from "../components/Indicator";
+import Schedules from "../components/Schedules";
 
 import footer from '../assets/footer.png'
 import { Image, StyleSheet, View } from "react-native";
@@ -29,7 +29,7 @@ const Main = () => {
 const styles = StyleSheet.create({
     footer: {
         position: 'absolute',
-        top: '165%',
+        top: '160%',
         width: '100%'
     }
 })

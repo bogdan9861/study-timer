@@ -24,7 +24,9 @@ const Indicator = () => {
 
         setStartHourse(Number(schedules[nowIndex][0][0] + schedules[nowIndex][0][1]))
         setStartMinutes(Number(schedules[nowIndex][0][3] + schedules[nowIndex][0][4]))
-    }, [nowIndex, hourses, minutes])
+
+        console.log(nowIndex);
+    }, [nowIndex, hourses, minutes, schedules])
 
     const convertHourses = (num) => {
         return num * 60;
@@ -37,24 +39,24 @@ const Indicator = () => {
     }, [endHourse, endMinutes, hourses, minutes, schedules])
 
     return (
-        !ended ? 
-        <View style={styles.indicator}>
-            <Text style={styles.indicator_title}>До конца:</Text>
-            <Text style={styles.indicator_time}>{Math.trunc(remaining / 60)}ч {remaining % 60}м</Text>
-            <View style={styles.indicator_inner}>
-                <Text style={styles.indicator_percents}>{Math.floor(remaining / duration * 100)}%</Text>       
-                <View style={styles.indicator_parent}>
-                    <View style={styles.indicator_backlayer}></View>
-                    <View
-                        style={[
-                            styles.indicator_frontlayer,
-                            {width: duration != 0 ? Math.floor(remaining / duration * 100) + '%' : 0}
-                        ]}
-                    />
+        !ended ?
+            <View style={styles.indicator}>
+                <Text style={styles.indicator_title}>До конца:</Text>
+                <Text style={styles.indicator_time}>{Math.trunc(remaining / 60)}ч {remaining % 60}м</Text>
+                <View style={styles.indicator_inner}>
+                    <Text style={styles.indicator_percents}>{Math.floor(remaining / duration * 100)}%</Text>
+                    <View style={styles.indicator_parent}>
+                        <View style={styles.indicator_backlayer}></View>
+                        <View
+                            style={[
+                                styles.indicator_frontlayer,
+                                { width: duration != 0 ? Math.floor(remaining / duration * 100) + '%' : 0 }
+                            ]}
+                        />
+                    </View>
                 </View>
             </View>
-        </View>
-        : null
+            : null
     )
 }
 
@@ -62,27 +64,23 @@ const styles = StyleSheet.create({
 
     indicator_title: {
         textAlign: 'center',
-        fontSize: 30,
-        fontWeight: '700',
-    },
-
-    indicator_text: {
         fontSize: 25,
-        fontWeight: '600',
-        paddingBottom: 10,
+        fontWeight: '400',
+        marginTop: 20,
+        marginBottom: 10,
     },
 
     indicator_time: {
+        fontSize: 60,
+        fontWeight: '800',
         textAlign: 'center',
-        fontSize: 20,
-        paddingBottom: 15,
-        marginBottom: 63,
+        marginBottom: 35,
     },
 
     indicator_inner: {
         width: 214,
         position: 'absolute',
-        bottom: '25%',
+        bottom: '-5%',
         left: '25%',
     },
 

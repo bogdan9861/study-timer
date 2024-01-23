@@ -3,8 +3,8 @@ import { View, StyleSheet, Text, ScrollView, Image } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { addFormatedTime, addNowIndex, toggleEnded } from '../slices/MainSlice'
-import replace from '../utils/replace'
 
+import replace from '../utils/replace'
 import AddZero from '../utils/AddZero'
 
 const Schedules = () => {
@@ -86,12 +86,12 @@ const Schedules = () => {
 const styles = StyleSheet.create({
 
     main: {
-
+        marginTop: 50,
     },
 
     main_text: {
         textAlign: 'center',
-        fontSize: 27,
+        fontSize: 35,
         fontWeight: '700',
         marginBottom: 50
     },

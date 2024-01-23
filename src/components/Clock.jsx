@@ -42,9 +42,9 @@ const Clock = () => {
 
   return (
     <View>
-      <Text style={styles.clock_text}>
+      {/* <Text style={styles.clock_text}>
         {AddZero(hourses)}:{AddZero(minutes)}
-      </Text>
+      </Text> */}
     </View>
   )
 }

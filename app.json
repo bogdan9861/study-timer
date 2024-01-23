@@ -4,10 +4,10 @@
     "slug": "timer",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/icnon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./src/assets/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,13 +19,13 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icnon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.besedin_b.timer"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/images/icnon.png"
     },
     "extra": {
       "eas": {

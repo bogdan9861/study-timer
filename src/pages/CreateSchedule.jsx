@@ -6,31 +6,37 @@ import {
     TextInput,
     Pressable,
     ScrollView,
-    Keyboard,
 } from "react-native"
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from 'react-redux'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Head from '../components/Head'
 import footer from '../assets/footer.png';
 import bin from '../assets/bin.png';
 
-import { addSchedules } from "../slices/MainSlice";
+import { addScheduleListItem } from "../slices/StartSlice";
 
 const CreateSchedule = ({ navigation }) => {
 
-    const [localSchedules, setLocalSchedules] = useState([])
+    const scheduleController = useSelector(state => state.start.ScheduleController);
+
+    const [scheduleName, setScheduleName] = useState('');
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [timeArr, setTimeArr] = useState(['', '']);
+    const [localSchedules, setLocalSchedules] = useState([])
 
     const [isDisabled, setDisabled] = useState(true);
+
+    const StartInput = useRef(null);
+    const EndInput = useRef(null);
 
     const dispatch = useDispatch();
 
     useEffect(() => {
         setDisabled(localSchedules.length == 0);
-    }, [timeArr])
+    }, [timeArr, localSchedules])
 
     const onSetTime = useEffect(() => {
         setTimeArr([startTime, endTime]);
@@ -45,18 +51,13 @@ const CreateSchedule = ({ navigation }) => {
         }
     }
 
-    const onNavigate = () => {
-        if (!isDisabled) {
-            dispatch(addSchedules(localSchedules));
-            navigation.navigate('Main', { name: 'Main' })
-        }
-    }
-
     const addNewTimeInterval = () => {
-        if (timeArr[0] != '' && timeArr[1] != '') {
+        if (scheduleName != '' && timeArr[0] != '' && timeArr[1] != '') {
             setLocalSchedules([...localSchedules, timeArr]);
             setStartTime('');
             setEndTime('');
+        } else {
+            alert('Заполните каждое поле');
         }
 
     }
@@ -73,6 +74,24 @@ const CreateSchedule = ({ navigation }) => {
         setLocalSchedules(filteredArr);
     }
 
+    const onNavigate = () => {
+        let newSchedule = { scheduleName, schedule: localSchedules, id: scheduleController.length };
+
+        dispatch(addScheduleListItem(newSchedule));
+        // saveSchedule();
+
+        navigation.navigate('Start', { name: 'Start' })
+    }
+
+
+    // const saveSchedule = async () => {
+    //     try {
+    //         await AsyncStorage.setItem('schedule', scheduleController)
+    //     } catch (error) {
+    //         console.log(e);
+    //     }
+    // }
+
     return (
         <View style={styles.create}>
             <Head />
@@ -85,31 +104,49 @@ const CreateSchedule = ({ navigation }) => {
             <View style={styles.form}>
                 <View style={styles.input_wrapper}>
                     <TextInput
-                        style={styles.input}
-                        placeholder="начало"
+                        style={[styles.input, styles.input_name]}
+                        placeholder="введите название"
                         placeholderTextColor="#fff"
-                        maxLength={5}
-                        keyboardType="number-pad"
-                        value={timeArr[0]}
-                        onChangeText={setStartTime}
+                        onChangeText={setScheduleName}
                     />
-                    <Pressable style={styles.input_btn}>
+                    <Pressable style={styles.input_btn} onPress={() => StartInput.current.focus()}>
                         <Text style={styles.input_btn_text}>+</Text>
                     </Pressable>
                 </View>
-                <View style={styles.input_wrapper}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="конец"
-                        placeholderTextColor="#fff"
-                        keyboardType="number-pad"
-                        maxLength={5}
-                        value={timeArr[1]}
-                        onChangeText={setEndTime}
-                    />
-                    <Pressable style={styles.input_btn} onPress={() => addNewTimeInterval()}>
-                        <Text style={styles.input_btn_text}>+</Text>
-                    </Pressable>
+                <View style={styles.form_inner}>
+                    <View style={styles.input_wrapper}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="начало"
+                            placeholderTextColor="#fff"
+                            maxLength={5}
+                            keyboardType="number-pad"
+                            value={timeArr[0]}
+                            onChangeText={setStartTime}
+                            ref={StartInput}
+                        />
+                        <Pressable
+                            style={styles.input_btn}
+                            onPress={() => EndInput.current.focus()}
+                        >
+                            <Text style={styles.input_btn_text}>+</Text>
+                        </Pressable>
+                    </View>
+                    <View style={styles.input_wrapper}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="конец"
+                            placeholderTextColor="#fff"
+                            keyboardType="number-pad"
+                            maxLength={5}
+                            value={timeArr[1]}
+                            onChangeText={setEndTime}
+                            ref={EndInput}
+                        />
+                        <Pressable style={styles.input_btn} onPress={() => addNewTimeInterval()}>
+                            <Text style={styles.input_btn_text}>+</Text>
+                        </Pressable>
+                    </View>
                 </View>
             </View>
             <View style={styles.create_list_wrapper}>
@@ -129,7 +166,7 @@ const CreateSchedule = ({ navigation }) => {
                 </ScrollView>
                 <Pressable
                     style={[styles.next_btn, isDisabled ? styles.disabled_style : {}]}
-                    onPress={() => onNavigate()}
+                    onPress={onNavigate}
                     disabled={isDisabled}
                 >
                     <Text style={styles.next_btn_text}>Подтвердить</Text>
@@ -162,18 +199,30 @@ const styles = StyleSheet.create({
     },
 
     form: {
+        marginLeft: 'auto',
+        marginRight: 'auto',
+    },
+
+    form_inner: {
+        width: '100%',
         flexDirection: 'row',
-        justifyContent: 'center',
         columnGap: 25,
+        marginBottom: 36,
     },
 
     input_wrapper: {
         position: 'relative',
-        marginBottom: 36,
+        marginBottom: 0,
+    },
+
+    input_name: {
+        width: '100%',
+        marginBottom: 15,
     },
 
     input: {
         width: 130,
+        height: 47,
 
         backgroundColor: '#E38663',
         borderRadius: 26,
@@ -182,7 +231,7 @@ const styles = StyleSheet.create({
         paddingVertical: 14,
 
         color: '#fff',
-        fontWeight: '700',
+        fontWeight: '400',
     },
 
     input_btn: {
@@ -252,6 +301,10 @@ const styles = StyleSheet.create({
         borderRadius: 11,
 
         justifyContent: 'center',
+    },
+
+    disabled_style: {
+        backgroundColor: '#BEBEBE',
     },
 
     next_btn_text: {
