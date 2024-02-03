@@ -1,9 +1,9 @@
 import { Text } from "react-native";
 
-const Alert = (condition, message, func) => {
+const Alert = (condition, message) => {
     if (condition) {
-        func()
-    } else alert(String(message));
+        alert(String(message));
+    } 
 }
 
 export default Alert
