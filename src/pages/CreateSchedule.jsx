@@ -8,10 +8,11 @@ import {
     ScrollView,
 } from "react-native"
 import { useEffect, useState, useRef } from "react";
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux';
+import { saveData } from '../utils/AsyncData';
 
-import { addNewDoc } from "../utils/addNewDoc";
-import {saveData, getData, deleteData} from '../utils/AsyncData'
+import replace from '../utils/replace'
+import Alert from "../utils/Alert";
 
 import Head from '../components/Head'
 import footer from '../assets/footer.png';
@@ -45,6 +46,7 @@ const CreateSchedule = ({ navigation }) => {
 
         setDots(startTime, setStartTime);
         setDots(endTime, setEndTime);
+
     }, [startTime, endTime])
 
     const setDots = (str, setStr) => {
@@ -54,13 +56,20 @@ const CreateSchedule = ({ navigation }) => {
     }
 
     const addNewTimeInterval = () => {
-        if (scheduleName != '' && timeArr[0] != '' && timeArr[1] != '') {
+
+        let isNotEmpty = scheduleName !== '' && timeArr[0] !== '' && timeArr[1] !== '';
+        let isValid = Number(replace(startTime)) <= 2359 && Number(replace(endTime)) <= 2359;
+
+        function setTime() {
+            isNotEmpty ? null : () => {alert('123'); return}
+
             setLocalSchedules([...localSchedules, timeArr]);
             setStartTime('');
             setEndTime('');
-        } else {
-            alert('Заполните каждое поле');
         }
+
+        setTime()
+
     }
 
     const removeTimeInterval = (i) => {
@@ -76,16 +85,22 @@ const CreateSchedule = ({ navigation }) => {
     }
 
     const onNavigate = () => {
-        let newSchedule = { name: scheduleName, schedules: localSchedules, id: scheduleController.length };
 
-        let covertedScgedule = {};
+        let id = scheduleController.length;
+        let name = scheduleName;
+
+        let newScheduleInfo = { name, schedules: localSchedules, id };
+
+        let covertedSchedule = {};
 
         localSchedules.forEach((el, i) => {
-            covertedScgedule[i] = el;
+            covertedSchedule[i] = el;
         })
 
-        addNewDoc({id: scheduleController.length, name: scheduleName, schedules: covertedScgedule});
-        dispatch(addScheduleListItem(newSchedule));
+        let newConvertedScheduleInfo = { id, name, schedules: covertedSchedule }
+
+        saveData(`${id}`, JSON.stringify(newConvertedScheduleInfo));
+        dispatch(addScheduleListItem(newScheduleInfo));
 
         navigation.navigate('Start', { name: 'Start' })
     }

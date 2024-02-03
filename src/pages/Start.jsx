@@ -2,15 +2,13 @@ import { useEffect } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet, Image, ActivityIndicator } from "react-native"
 import { useDispatch, useSelector } from "react-redux";
 import { addSchedules, addNowIndex, addFormatedTime } from '../slices/MainSlice'
-import { addNewScheduleList, changeItemId, addScheduleListItem, changeLoading } from "../slices/StartSlice";
-import db from '../../firebase'
-import { orderBy, query } from "firebase/firestore";
+import { addNewScheduleList, changeItemId, addScheduleListItem, changeLoading, removeSchedule } from "../slices/StartSlice";
+import { getData, getAllDataKeys, deleteData } from "../utils/AsyncData";
 
 import Head from "../components/Head"
 import footer from "../assets/footer.png"
 import bin from '../assets/bin.png';
 import arrow from '../assets/arrow.png';
-import { collection, onSnapshot } from "firebase/firestore";
 
 
 const Start = ({ navigation }) => {
@@ -23,47 +21,44 @@ const Start = ({ navigation }) => {
         navigation.navigate(path, { name: path })
     }
 
+    const deleteAllData = () => {
+        getAllDataKeys()
+            .then((res) => deleteDataByKeys(res))
+            .catch(e => console.log(e))
+
+        function deleteDataByKeys(keys) {
+            keys.forEach(key => deleteData(`${key}`))
+        }
+    }
+
     const deleteScheduleFromList = (i) => {
-        const filteredArr = ScheduleController.filter(el => {
-            if (i == el.id) {
-                return false
-            }
-
-            return true;
-        })
-
-        dispatch(addNewScheduleList(filteredArr));
-        dispatch(changeItemId(i))
+        deleteData(`${ScheduleController[i].id}`)
+        dispatch(removeSchedule(i));
     }
 
     useEffect(() => {
         dispatch(changeLoading(true));
 
-        let schedulesInfoList = []
+        getAllDataKeys()
+            .then((res) => getDataByKeys(res))
+            .then(() => dispatch(changeLoading(false)))
+            .catch(e => console.log(e))
 
-        const scheduleRef = collection(db, 'schedule');
-        const q = query(scheduleRef, orderBy('id'))
-
-        onSnapshot(q, (snapshot) => {
-
-            schedulesInfoList = [];
-
-            snapshot.docs.forEach(doc => {
-                schedulesInfoList.push(doc.data());
+        function getDataByKeys(keys) {
+            keys.forEach((key, i) => {
+                getData(key).then((res) => {
+                    dispatch(addScheduleListItem(JSON.parse(res)))
+                })
             })
+        }
 
-            schedulesInfoList.forEach(el => {
-                dispatch(addScheduleListItem(el))
-                dispatch(changeLoading(false));
-            })
-        })
     }, [])
-    
+
 
     const redirectWithChedule = (index) => {
         let scheduleArr = [];
 
-        if (!loading && index == ScheduleController[index].id) {
+        if (!loading) {
             for (let i in Object.keys(ScheduleController[index].schedules)) {
                 scheduleArr.push(ScheduleController[index].schedules[i])
             }
@@ -91,7 +86,7 @@ const Start = ({ navigation }) => {
             </Text>
             <ScrollView style={styles.list}>
                 {
-                    loading ? <ActivityIndicator /> :
+                    loading && ScheduleController.length > 0 ? <ActivityIndicator /> :
                         ScheduleController.map((el, i) => {
                             return (
                                 <View style={styles.list_item} key={i}>
@@ -180,7 +175,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F5D99A',
         width: 150,
         height: 50,
-        alignSelf: 'flex-end',
+        alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 10,

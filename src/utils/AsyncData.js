@@ -20,6 +20,19 @@ export const getData = async (key) => {
     }
 }
 
+export const getAllDataKeys = async (key) => {
+    try {
+        const keys = await AsyncStorage.getAllKeys();
+
+        if (keys != null) {
+            return keys
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const deleteData = async (key) => {
     try {
         await AsyncStorage.removeItem(key)

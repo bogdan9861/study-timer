@@ -27,6 +27,10 @@ const StartSlice = createSlice({
 
         changeLoading: (state, action) => {
             state.loading = action.payload
+        },
+
+        removeSchedule: (state, action) => {
+            state.ScheduleController.splice(action.payload, 1)
         }
     },
 })
@@ -39,5 +43,6 @@ export const {
     addNewScheduleList,
     setScheduleName,
     changeItemId,
-    changeLoading
+    changeLoading,
+    removeSchedule
 } = actions;

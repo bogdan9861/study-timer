@@ -17,17 +17,14 @@ const Main = () => {
             <Clock />
             <Indicator />
             <Schedules />
-            {
-                !ended ?
-                    <Image style={styles.footer} source={footer}></Image>
-                    : null
-            }
+            <Image style={styles.footer} source={footer}></Image>
+
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-    main:{
+    main: {
         height: '100%',
     },
 
