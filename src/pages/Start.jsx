@@ -1,22 +1,21 @@
-import { View, Text, Pressable, ScrollView, StyleSheet, Image } from "react-native"
+import { useEffect } from "react";
+import { View, Text, Pressable, ScrollView, StyleSheet, Image, ActivityIndicator } from "react-native"
+import { useDispatch, useSelector } from "react-redux";
+import { addSchedules, addNowIndex, addFormatedTime } from '../slices/MainSlice'
+import { addNewScheduleList, changeItemId, addScheduleListItem, changeLoading } from "../slices/StartSlice";
+import db from '../../firebase'
+import { orderBy, query } from "firebase/firestore";
 
 import Head from "../components/Head"
 import footer from "../assets/footer.png"
-
-import { useDispatch, useSelector } from "react-redux";
-
 import bin from '../assets/bin.png';
 import arrow from '../assets/arrow.png';
-import { useEffect } from "react";
+import { collection, onSnapshot } from "firebase/firestore";
 
-import { addSchedules, addNowIndex, addFormatedTime } from '../slices/MainSlice'
-import { addNewScheduleList, changeItemId } from "../slices/StartSlice";
-
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Start = ({ navigation }) => {
 
-    const scheduleController = useSelector(state => state.start.ScheduleController);
+    const { ScheduleController, loading } = useSelector(state => state.start);
 
     const dispatch = useDispatch();
 
@@ -24,17 +23,8 @@ const Start = ({ navigation }) => {
         navigation.navigate(path, { name: path })
     }
 
-    const RedirectWithChedule = (i) => {
-        if (i == scheduleController[i].id) {
-            dispatch(addNowIndex(0))
-            dispatch(addFormatedTime(""))
-            dispatch(addSchedules(scheduleController[i].schedule))
-            Redirect('Main');
-        }
-    }
-
     const deleteScheduleFromList = (i) => {
-        const filteredArr = scheduleController.filter(el => {
+        const filteredArr = ScheduleController.filter(el => {
             if (i == el.id) {
                 return false
             }
@@ -42,53 +32,83 @@ const Start = ({ navigation }) => {
             return true;
         })
 
-        dispatch(changeItemId(i))
         dispatch(addNewScheduleList(filteredArr));
+        dispatch(changeItemId(i))
     }
 
-    // const getSchedule = async () => {
-    //     try {
-    //         const schedule = await AsyncStorage.getItem('schedule');
-    //         dispatch(addNewScheduleList(schedule))
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
+    useEffect(() => {
+        dispatch(changeLoading(true));
 
-    // useEffect(() => {
-    //     getSchedule();
-    // }, [])
+        let schedulesInfoList = []
+
+        const scheduleRef = collection(db, 'schedule');
+        const q = query(scheduleRef, orderBy('id'))
+
+        onSnapshot(q, (snapshot) => {
+
+            schedulesInfoList = [];
+
+            snapshot.docs.forEach(doc => {
+                schedulesInfoList.push(doc.data());
+            })
+
+            schedulesInfoList.forEach(el => {
+                dispatch(addScheduleListItem(el))
+                dispatch(changeLoading(false));
+            })
+        })
+    }, [])
+    
+
+    const redirectWithChedule = (index) => {
+        let scheduleArr = [];
+
+        if (!loading && index == ScheduleController[index].id) {
+            for (let i in Object.keys(ScheduleController[index].schedules)) {
+                scheduleArr.push(ScheduleController[index].schedules[i])
+            }
+        }
+
+        dispatch(addNowIndex(0))
+        dispatch(addFormatedTime(""))
+        dispatch(addSchedules(scheduleArr));
+        Redirect('Main');
+    }
+
+    useEffect(() => {
+
+    }, [])
 
     return (
         <View style={styles.start}>
             <Head />
             <Text style={styles.start_title}>
                 {
-                    scheduleController.length > 0
+                    ScheduleController.length > 0
                         ? 'Список расписаний'
                         : 'Добавьте расписание'
                 }
             </Text>
             <ScrollView style={styles.list}>
                 {
-                    scheduleController.map((el, i) => {
-                        return (
-                            <View style={styles.list_item} key={i}>
-                                <View style={styles.item_inner}>
-                                    <Text style={styles.item_name}>1. {el.scheduleName}</Text>
-                                    <Pressable style={styles.delete} onPress={() => deleteScheduleFromList(i)}>
-                                        <Image source={bin} />
+                    loading ? <ActivityIndicator /> :
+                        ScheduleController.map((el, i) => {
+                            return (
+                                <View style={styles.list_item} key={i}>
+                                    <View style={styles.item_inner}>
+                                        <Text style={styles.item_name}>{i + 1}. {el.name}</Text>
+                                        <Pressable style={styles.delete} onPress={() => deleteScheduleFromList(i)}>
+                                            <Image source={bin} />
+                                        </Pressable>
+                                    </View>
+
+                                    <Pressable style={styles.next} onPress={() => redirectWithChedule(i)}>
+                                        <Image source={arrow} />
                                     </Pressable>
                                 </View>
-
-                                <Pressable style={styles.next} onPress={() => RedirectWithChedule(i)}>
-                                    <Image source={arrow} />
-                                </Pressable>
-                            </View>
-                        )
-                    })
+                            )
+                        })
                 }
-
             </ScrollView>
             <Pressable
                 style={styles.add}
@@ -160,10 +180,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#F5D99A',
         width: 150,
         height: 50,
+        alignSelf: 'flex-end',
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 10,
-        marginLeft: 10,
+        marginRight: 10,
         marginTop: 30,
     },
 

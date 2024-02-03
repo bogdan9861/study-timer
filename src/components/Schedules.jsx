@@ -34,7 +34,7 @@ const Schedules = () => {
 
     return (
         <View style={styles.main}>
-            <Text style={styles.main_text}>{!ended ? 'расписние:' : 'пары закончились!'} </Text>
+            <Text style={styles.main_text}>{!ended ? 'расписание:' : 'пары закончились!'} </Text>
             <ScrollView style={styles.main_scroll}>
                 {
                     schedules.map((time, i) => {

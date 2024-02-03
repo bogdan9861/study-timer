@@ -9,7 +9,9 @@ import {
 } from "react-native"
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from 'react-redux'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { addNewDoc } from "../utils/addNewDoc";
+import {saveData, getData, deleteData} from '../utils/AsyncData'
 
 import Head from '../components/Head'
 import footer from '../assets/footer.png';
@@ -59,7 +61,6 @@ const CreateSchedule = ({ navigation }) => {
         } else {
             alert('Заполните каждое поле');
         }
-
     }
 
     const removeTimeInterval = (i) => {
@@ -75,22 +76,19 @@ const CreateSchedule = ({ navigation }) => {
     }
 
     const onNavigate = () => {
-        let newSchedule = { scheduleName, schedule: localSchedules, id: scheduleController.length };
+        let newSchedule = { name: scheduleName, schedules: localSchedules, id: scheduleController.length };
 
+        let covertedScgedule = {};
+
+        localSchedules.forEach((el, i) => {
+            covertedScgedule[i] = el;
+        })
+
+        addNewDoc({id: scheduleController.length, name: scheduleName, schedules: covertedScgedule});
         dispatch(addScheduleListItem(newSchedule));
-        // saveSchedule();
 
         navigation.navigate('Start', { name: 'Start' })
     }
-
-
-    // const saveSchedule = async () => {
-    //     try {
-    //         await AsyncStorage.setItem('schedule', scheduleController)
-    //     } catch (error) {
-    //         console.log(e);
-    //     }
-    // }
 
     return (
         <View style={styles.create}>
@@ -179,7 +177,6 @@ const CreateSchedule = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     create: {
-        position: 'relative',
         height: '100%',
     },
 
@@ -194,8 +191,8 @@ const styles = StyleSheet.create({
         lineHeight: 43,
 
         maxWidth: 250,
-        marginTop: 40,
-        marginBottom: 50,
+        marginTop: 20,
+        marginBottom: 35,
     },
 
     form: {
@@ -260,7 +257,7 @@ const styles = StyleSheet.create({
 
     create_list: {
         height: 150,
-        marginBottom: 40,
+        marginBottom: 30,
     },
 
     create_list_item: {
@@ -321,7 +318,8 @@ const styles = StyleSheet.create({
     footer: {
         width: '100%',
         position: 'absolute',
-        top: "85%",
+        bottom: 0,
+        zIndex: -1,
     }
 })
 

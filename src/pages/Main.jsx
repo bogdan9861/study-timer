@@ -27,10 +27,15 @@ const Main = () => {
 }
 
 const styles = StyleSheet.create({
+    main:{
+        height: '100%',
+    },
+
     footer: {
         position: 'absolute',
-        top: '160%',
-        width: '100%'
+        bottom: 0,
+        width: '100%',
+        zIndex: -1
     }
 })
 

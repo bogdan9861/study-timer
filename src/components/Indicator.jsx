@@ -24,8 +24,6 @@ const Indicator = () => {
 
         setStartHourse(Number(schedules[nowIndex][0][0] + schedules[nowIndex][0][1]))
         setStartMinutes(Number(schedules[nowIndex][0][3] + schedules[nowIndex][0][4]))
-
-        console.log(nowIndex);
     }, [nowIndex, hourses, minutes, schedules])
 
     const convertHourses = (num) => {
