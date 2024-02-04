@@ -118,6 +118,10 @@ const Start = ({ navigation }) => {
 
 const styles = StyleSheet.create({
 
+    start: {
+        height: '100%'
+    },
+
     start_title: {
         fontSize: 35,
         fontWeight: '700',
@@ -180,12 +184,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 10,
         marginRight: 10,
-        marginTop: 30,
+        marginTop: 50,
+        marginBottom: 180
     },
 
     footer: {
         position: 'absolute',
-        top: '110%',
+        bottom: 0,
         width: '100%',
     },
 });

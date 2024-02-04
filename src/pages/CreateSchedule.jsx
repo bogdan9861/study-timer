@@ -57,14 +57,19 @@ const CreateSchedule = ({ navigation }) => {
 
     const addNewTimeInterval = () => {
 
-        let isNotEmpty = scheduleName !== '' && timeArr[0] !== '' && timeArr[1] !== '';
-        let isValid = Number(replace(startTime)) <= 2359 && Number(replace(endTime)) <= 2359 && startTime.length == 5 && endTime.length == 5;55
+        let startNumber = Number(replace(startTime)),
+            endNumber = Number(replace(endTime));
+
+        let isNotEmpty = scheduleName !== '' && timeArr[0] !== '' && timeArr[1] !== '',
+            isValid    = startNumber <= 2359 && endNumber <= 2359 && startTime.length == 5 && endTime.length == 5,
+            notLess    = startNumber < endNumber;
 
         Alert(!isNotEmpty, 'Заполните каждое поле');
         Alert(!isValid, 'Вы ввели не корректные данные');
+        Alert(!notLess, 'Время начала больше или равно времени конца');
 
         function setTime() {
-            if (!isNotEmpty || !isValid) return; 
+            if (!isNotEmpty || !isValid || !notLess) return; 
 
             setLocalSchedules([...localSchedules, timeArr]);
             setStartTime('');

@@ -5,18 +5,15 @@ import Schedules from "../components/Schedules";
 
 import footer from '../assets/footer.png'
 import { Image, StyleSheet, View } from "react-native";
-import { useSelector } from "react-redux";
 
 
-const Main = () => {
-    const { ended } = useSelector(state => state.main)
-
+const Main = ({ navigation }) => {
     return (
         <View style={styles.main}>
             <Head />
             <Clock />
             <Indicator />
-            <Schedules />
+            <Schedules navigation={navigation} />
             <Image style={styles.footer} source={footer}></Image>
 
         </View>

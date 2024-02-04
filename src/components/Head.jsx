@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   },
 
   header_img: {
-    width: '100%',
+  
   },
 
   header_logo: {

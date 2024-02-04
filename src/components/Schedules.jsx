@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, Text, ScrollView, Image } from 'react-native'
+import { View, StyleSheet, Text, ScrollView, Image, Pressable } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { addFormatedTime, addNowIndex, toggleEnded } from '../slices/MainSlice'
@@ -7,7 +7,7 @@ import { addFormatedTime, addNowIndex, toggleEnded } from '../slices/MainSlice'
 import replace from '../utils/replace'
 import AddZero from '../utils/AddZero'
 
-const Schedules = () => {
+const Schedules = ({ navigation }) => {
 
     const { hourses, minutes } = useSelector(state => state.clock);
     const { schedules, formatedTime, nowIndex, ended } = useSelector(state => state.main);
@@ -24,17 +24,32 @@ const Schedules = () => {
             }
         })
 
-        if (formatedTime > Number(replace(schedules[schedules.length - 1][1]))){
+        if (formatedTime > Number(replace(schedules[schedules.length - 1][1]))) {
             dispatch(toggleEnded(true));
-        }else {
+        } else {
             dispatch(toggleEnded(false));
         }
 
     }, [formatedTime, schedules, hourses, minutes])
 
+    const Redirect = (path) => {
+        navigation.navigate(path, { name: path })
+    }
+
     return (
         <View style={styles.main}>
-            <Text style={styles.main_text}>{!ended ? 'расписание:' : 'пары закончились!'} </Text>
+            <Text style={styles.main_text}>{!ended ? 'расписание:' : 'Занятия закончились'} </Text>
+            {
+                ended ?
+                    <Pressable
+                        onPress={() => Redirect('Start')}
+                        style={styles.back}
+                    >
+                        <Text>назад</Text>
+                    </Pressable>
+
+                    : null
+            }
             <ScrollView style={styles.main_scroll}>
                 {
                     schedules.map((time, i) => {
@@ -69,7 +84,7 @@ const Schedules = () => {
                                             }
                                         >
                                             {
-                                                i % 2 == 0 ? 'пара' : 'перемена'
+                                                i % 2 == 0 ? 'занятие' : 'перемена'
                                             }
                                         </Text>
                                     </View>
@@ -167,6 +182,11 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontWeight: '700'
     },
+
+    back: {
+        marginLeft: 'auto',
+        marginRight: 'auto'
+    }
 })
 
 export default Schedules
