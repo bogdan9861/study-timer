@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1089055352990",
+    "project_id": "study-timer-e7c07",
+    "storage_bucket": "study-timer-e7c07.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1089055352990:android:1d5b0ad4a677f9531df38f",
+        "android_client_info": {
+          "package_name": "com.besedin_b.timer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASls6T03hRYhW5NquRlWudHOTT5ZC8sw0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

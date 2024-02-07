@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { useRef, useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, Button } from 'react-native';
 import { Provider } from 'react-redux';
 import { NavigationContainer as Container } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -9,10 +10,11 @@ import Main from './src/pages/Main';
 
 import Store from './src/store';
 
+
 const Stack = createNativeStackNavigator();
 
-
 export default function App() {
+
   return (
 
     <Provider store={Store}>

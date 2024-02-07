@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Dimensions } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { setDuration } from "../slices/IndicatorSlice"
+import { useNotifications } from "../utils/useNotifications"
 
 import replace from "../utils/replace";
 
@@ -18,10 +19,10 @@ const Indicator = () => {
 
     const [endHourse, setEndHourse] = useState(0);
     const [endMinutes, setEndMinutes] = useState(0);
-
-    const [remaining, setRemaining] = useState(0);  
+    const [remaining, setRemaining] = useState(0);
 
     const dispatch = useDispatch();
+    const notification = useNotifications();
 
     useEffect(() => {
         setEndHourse(Number(schedules[nowIndex][1][0] + schedules[nowIndex][1][1]))
@@ -39,8 +40,23 @@ const Indicator = () => {
 
     useEffect(() => {
         setRemaining(Number((convertHourses(endHourse) + endMinutes) - (convertHourses(Number(hourses)) + Number(minutes))));
-        dispatch(setDuration( (convertHourses(endHourse) + endMinutes) - (convertHourses(startHourse) + startMinutes) ))
+        dispatch(setDuration((convertHourses(endHourse) + endMinutes) - (convertHourses(startHourse) + startMinutes)))
     }, [endHourse, endMinutes, hourses, minutes, schedules])
+
+    useEffect(() => {
+
+        let devidedTrigger = duration / 3;
+
+        console.log(Math.trunc(devidedTrigger));
+
+        if (remaining % Math.floor(devidedTrigger) == 0) {
+            notification.sendNotification('Обратите внимание', `до завершения события осталось ${Math.trunc(remaining / 60)} ч. ${remaining % 60} м.`)
+                .then((res) => console.log(res))
+                .catch(e => console.log(e))
+        }
+
+
+    }, [remaining])
 
     return (
         !ended ?
