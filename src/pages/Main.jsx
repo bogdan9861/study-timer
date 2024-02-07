@@ -1,20 +1,22 @@
+import { Image, StyleSheet, View } from "react-native";
+
 import Head from "../components/Head";
 import Clock from "../components/Clock";
 import Indicator from "../components/Indicator";
 import Schedules from "../components/Schedules";
+import Footer from "../components/Footer";
 
-import footer from '../assets/footer.png'
-import { Image, StyleSheet, View } from "react-native";
 
 
 const Main = ({ navigation }) => {
+
     return (
         <View style={styles.main}>
             <Head />
             <Clock />
             <Indicator />
             <Schedules navigation={navigation} />
-            <Image style={styles.footer} source={footer}></Image>
+            <Footer />
 
         </View>
     )

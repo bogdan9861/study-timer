@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { View, StyleSheet, Text, ScrollView, Image, Pressable } from 'react-native'
 import { useSelector, useDispatch } from 'react-redux'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
 import { addFormatedTime, addNowIndex, toggleEnded } from '../slices/MainSlice'
+import Clock from './Clock'
 
 import replace from '../utils/replace'
 import AddZero from '../utils/AddZero'
@@ -11,6 +13,7 @@ const Schedules = ({ navigation }) => {
 
     const { hourses, minutes } = useSelector(state => state.clock);
     const { schedules, formatedTime, nowIndex, ended } = useSelector(state => state.main);
+    const { duration } = useSelector(state => state.indicator)
 
     const dispatch = useDispatch();
 
@@ -38,63 +41,66 @@ const Schedules = ({ navigation }) => {
 
     return (
         <View style={styles.main}>
-            <Text style={styles.main_text}>{!ended ? 'расписание:' : 'Занятия закончились'} </Text>
-            {
-                ended ?
-                    <Pressable
-                        onPress={() => Redirect('Start')}
-                        style={styles.back}
-                    >
-                        <Text>назад</Text>
-                    </Pressable>
 
-                    : null
+            {
+                !ended
+                    ?
+                    <Text style={styles.main_text}>расписание</Text>
+                    :
+                    <View>
+                        <Text style={styles.main_text} >Расписание подошло к концу</Text>
+                        <Pressable
+                            onPress={() => Redirect('Start')}
+                            style={styles.back}
+                        >
+                            <Text>назад</Text>
+                        </Pressable>
+                    </View>
             }
             <ScrollView style={styles.main_scroll}>
                 {
                     schedules.map((time, i) => {
+                        let now = nowIndex == i;
                         if (ended) return;
                         return (
                             <View
                                 key={i}
                                 style={
-                                    nowIndex == i ?
+                                    now ?
                                         [styles.main_list_item, styles.main_list_item_active]
                                         :
                                         styles.main_list_item
                                 }
                             >
-                                <Text style={
-                                    nowIndex == i ?
-                                        [styles.main_list_now, styles.active]
-                                        :
-                                        styles.main_list_now
-                                }>
-                                    сейчас
-                                </Text>
-                                <View>
-                                    <Text style={styles.main_item_text}>{time[0]} - {time[1]}</Text>
-                                    <View style={styles.main_item_subtext_wrapper}>
-                                        <Text
-                                            style={
-                                                nowIndex == i ?
-                                                    [styles.main_item_subtext, { textAlign: 'right' }]
-                                                    :
-                                                    styles.main_item_subtext
-                                            }
-                                        >
-                                            {
-                                                i % 2 == 0 ? 'занятие' : 'перемена'
-                                            }
+                                <View style={[styles.main_item_top, now ? { flexDirection: 'row' } : {}]}>
+                                    <View>
+                                        <Text style={
+                                            now ?
+                                                [styles.main_list_now, styles.active]
+                                                :
+                                                styles.main_list_now
+                                        }>
+                                            сейчас
                                         </Text>
                                     </View>
+
+                                    <Text style={styles.main_item_text}>{time[0]} - {time[1]}</Text>
+                                </View>
+
+                                <View style={[styles.duration_wrapper, now ? { paddingTop: hp('1%') } : {}]}>
+
+                                    {now ? <Text style={styles.duration_text}>длительность: {Math.trunc(duration / 60)} ч. {duration % 60} м.</Text> : null}
+
+                                    <Text style={styles.duration}></Text>
+
                                 </View>
                             </View>
+
                         )
                     })
                 }
             </ScrollView>
-        </View>
+        </View >
     )
 }
 
@@ -106,8 +112,10 @@ const styles = StyleSheet.create({
 
     main_text: {
         textAlign: 'center',
-        fontSize: 35,
+        fontSize: hp('3%'),
         fontWeight: '700',
+
+        marginTop: hp('0%'),
         marginBottom: 50
     },
 
@@ -118,9 +126,14 @@ const styles = StyleSheet.create({
         height: 300,
     },
 
+    main_item_top: {
+        justifyContent: 'space-between',
+        width: '100%'
+    },
+
     main_list_item: {
         width: 200,
-        height: 70,
+        height: hp('8.5%'),
         borderRadius: 10,
 
         backgroundColor: '#DDD8D4',
@@ -129,15 +142,14 @@ const styles = StyleSheet.create({
 
         marginLeft: 10,
         marginBottom: 10,
+
+        justifyContent: 'center',
     },
 
     main_list_item_active: {
         backgroundColor: '#F5D99A',
 
-        width: '80%',
-
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        width: wp('80%'),
 
         paddingVertical: 10,
     },
@@ -157,23 +169,30 @@ const styles = StyleSheet.create({
         paddingRight: 15,
     },
 
-    main_item_index: {
-        width: 25,
-        height: 25,
+    duration_wrapper: {
+        flexDirection: 'row',
+    },
 
-        backgroundColor: '#FFF',
-        borderRadius: 15,
+    duration_text: {
+        marginRight: 10,
+    },
 
-        padding: 1,
-        textAlign: 'center'
+    duration: {
+        fontWeight: '700',
     },
 
     main_list_now: {
         opacity: 0,
+        width: 0,
+        height: 0,
+        fontWeight: '700',
+        fontSize: hp('2%')
     },
 
     active: {
         opacity: 1,
+        width: 'auto',
+        height: 'auto',
     },
 
     ended_text: {

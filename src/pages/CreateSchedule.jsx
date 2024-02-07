@@ -6,19 +6,21 @@ import {
     TextInput,
     Pressable,
     ScrollView,
+    Dimensions,
 } from "react-native"
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { saveData } from '../utils/AsyncData';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
 import replace from '../utils/replace'
 import Alert from "../utils/Alert";
 
 import Head from '../components/Head'
-import footer from '../assets/footer.png';
 import bin from '../assets/bin.png';
 
 import { addScheduleListItem } from "../slices/StartSlice";
+import Footer from "../components/Footer";
 
 const CreateSchedule = ({ navigation }) => {
 
@@ -61,15 +63,15 @@ const CreateSchedule = ({ navigation }) => {
             endNumber = Number(replace(endTime));
 
         let isNotEmpty = scheduleName !== '' && timeArr[0] !== '' && timeArr[1] !== '',
-            isValid    = startNumber <= 2359 && endNumber <= 2359 && startTime.length == 5 && endTime.length == 5,
-            notLess    = startNumber < endNumber;
+            isValid = startNumber <= 2359 && endNumber <= 2359 && startTime.length == 5 && endTime.length == 5,
+            notLess = startNumber < endNumber;
 
         Alert(!isNotEmpty, 'Заполните каждое поле');
         Alert(!isValid, 'Вы ввели не корректные данные');
         Alert(!notLess, 'Время начала больше или равно времени конца');
 
         function setTime() {
-            if (!isNotEmpty || !isValid || !notLess) return; 
+            if (!isNotEmpty || !isValid || !notLess) return;
 
             setLocalSchedules([...localSchedules, timeArr]);
             setStartTime('');
@@ -192,14 +194,14 @@ const CreateSchedule = ({ navigation }) => {
                     <Text style={styles.next_btn_text}>Подтвердить</Text>
                 </Pressable>
             </View>
-            <Image style={styles.footer} source={footer} />
+            <Footer />
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     create: {
-        height: '100%',
+        height: hp('100%'),
     },
 
     create_title_wrapper: {
@@ -207,14 +209,14 @@ const styles = StyleSheet.create({
     },
 
     create_title: {
-        fontSize: 40,
+        fontSize: hp('4%'),
         fontWeight: '700',
         textAlign: 'center',
-        lineHeight: 43,
+        lineHeight: hp('4.1%'),
 
-        maxWidth: 250,
-        marginTop: 20,
-        marginBottom: 35,
+        maxWidth: wp('60%'),
+        marginTop: hp('8%'),
+        marginBottom: hp('8%'),
     },
 
     form: {
@@ -226,7 +228,7 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         columnGap: 25,
-        marginBottom: 36,
+        marginBottom: hp('5%'),
     },
 
     input_wrapper: {
@@ -237,6 +239,7 @@ const styles = StyleSheet.create({
     input_name: {
         width: '100%',
         marginBottom: 15,
+
     },
 
     input: {
@@ -272,14 +275,14 @@ const styles = StyleSheet.create({
     },
 
     create_list_wrapper: {
-        width: '100%',
+        width: wp('100%'),
         alignItems: 'center',
         justifyContent: 'center',
     },
 
     create_list: {
-        height: 150,
-        marginBottom: 30,
+        height: hp('20%'),
+        marginBottom: Dimensions.get('window').height > 895 ? hp('0%') : hp('0%'),
     },
 
     create_list_item: {
@@ -298,6 +301,7 @@ const styles = StyleSheet.create({
     item_text: {
         fontSize: 20,
         fontWeight: '700',
+        fontSize: hp('2.3%')
     },
 
     item_delete: {
@@ -329,7 +333,7 @@ const styles = StyleSheet.create({
     next_btn_text: {
         textAlign: 'center',
         fontSize: 16,
-        fontWeight: '400',
+        fontSize: hp('1.6%')
     },
 
     header: {

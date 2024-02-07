@@ -7,6 +7,9 @@ import AddZero from '../utils/AddZero'
 
 const Clock = () => {
   const { hourses, minutes } = useSelector(state => state.clock);
+  const { ended } = useSelector(state => state.main);
+
+
   const [localHourses, setLocalHourses] = useState(0);
   const [localMinutes, setLocalMinutes] = useState(0);
 
@@ -42,9 +45,13 @@ const Clock = () => {
 
   return (
     <View>
-      {/* <Text style={styles.clock_text}>
-        {AddZero(hourses)}:{AddZero(minutes)}
-      </Text> */}
+      {
+        ended ?
+        <Text style={styles.clock_text}>
+          {AddZero(hourses)}:{AddZero(minutes)}
+        </Text>
+        : null
+      }
     </View>
   )
 }

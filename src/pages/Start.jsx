@@ -1,14 +1,16 @@
-import { useEffect } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, Image, ActivityIndicator } from "react-native"
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from 'react'
+import { View, Text, Pressable, ScrollView, StyleSheet, Image, ActivityIndicator, Dimensions } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
 import { addSchedules, addNowIndex, addFormatedTime } from '../slices/MainSlice'
-import { addNewScheduleList, changeItemId, addScheduleListItem, changeLoading, removeSchedule } from "../slices/StartSlice";
-import { getData, getAllDataKeys, deleteData } from "../utils/AsyncData";
+import { addScheduleListItem, changeLoading, removeSchedule } from '../slices/StartSlice'
+import { getData, getAllDataKeys, deleteData } from '../utils/AsyncData'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
-import Head from "../components/Head"
-import footer from "../assets/footer.png"
-import bin from '../assets/bin.png';
-import arrow from '../assets/arrow.png';
+import Footer from '../components/Footer'
+
+import Head from '../components/Head'
+import bin from '../assets/bin.png'
+import arrow from '../assets/arrow.png'
 
 
 const Start = ({ navigation }) => {
@@ -65,7 +67,7 @@ const Start = ({ navigation }) => {
         }
 
         dispatch(addNowIndex(0))
-        dispatch(addFormatedTime(""))
+        dispatch(addFormatedTime(''))
         dispatch(addSchedules(scheduleArr));
         Redirect('Main');
     }
@@ -111,19 +113,15 @@ const Start = ({ navigation }) => {
             >
                 <Text>Добавить</Text>
             </Pressable>
-            <Image style={styles.footer} source={footer} />
+            <Footer/>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
 
-    start: {
-        height: '100%'
-    },
-
     start_title: {
-        fontSize: 35,
+        fontSize: hp('4%'),
         fontWeight: '700',
         textAlign: 'center',
         marginTop: 35,
@@ -186,12 +184,6 @@ const styles = StyleSheet.create({
         marginRight: 10,
         marginTop: 50,
         marginBottom: 180
-    },
-
-    footer: {
-        position: 'absolute',
-        bottom: 0,
-        width: '100%',
     },
 });
 

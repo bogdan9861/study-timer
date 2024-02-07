@@ -1,6 +1,9 @@
 import { StyleSheet, Text, View } from "react-native"
-import { useSelector } from "react-redux"
-import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux"
+import { useEffect, useState } from "react"
+import { Dimensions } from 'react-native'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { setDuration } from "../slices/IndicatorSlice"
 
 import replace from "../utils/replace";
 
@@ -8,6 +11,7 @@ const Indicator = () => {
 
     const { nowIndex, schedules, ended } = useSelector(state => state.main);
     const { hourses, minutes } = useSelector(state => state.clock);
+    const { duration } = useSelector(state => state.indicator)
 
     const [startHourse, setStartHourse] = useState(0);
     const [startMinutes, setStartMinutes] = useState(0);
@@ -15,8 +19,9 @@ const Indicator = () => {
     const [endHourse, setEndHourse] = useState(0);
     const [endMinutes, setEndMinutes] = useState(0);
 
-    const [remaining, setRemaining] = useState(0);
-    const [duration, setDuration] = useState(0);
+    const [remaining, setRemaining] = useState(0);  
+
+    const dispatch = useDispatch();
 
     useEffect(() => {
         setEndHourse(Number(schedules[nowIndex][1][0] + schedules[nowIndex][1][1]))
@@ -24,6 +29,8 @@ const Indicator = () => {
 
         setStartHourse(Number(schedules[nowIndex][0][0] + schedules[nowIndex][0][1]))
         setStartMinutes(Number(schedules[nowIndex][0][3] + schedules[nowIndex][0][4]))
+
+
     }, [nowIndex, hourses, minutes, schedules])
 
     const convertHourses = (num) => {
@@ -32,8 +39,7 @@ const Indicator = () => {
 
     useEffect(() => {
         setRemaining(Number((convertHourses(endHourse) + endMinutes) - (convertHourses(Number(hourses)) + Number(minutes))));
-
-        setDuration((convertHourses(endHourse) + endMinutes) - (convertHourses(startHourse) + startMinutes));
+        dispatch(setDuration( (convertHourses(endHourse) + endMinutes) - (convertHourses(startHourse) + startMinutes) ))
     }, [endHourse, endMinutes, hourses, minutes, schedules])
 
     return (
@@ -79,7 +85,7 @@ const styles = StyleSheet.create({
         width: 214,
         position: 'absolute',
         bottom: '-5%',
-        left: '25%',
+        left: Dimensions.get('window').width > 500 ? wp('30%') : wp('25%'),
     },
 
     indicator_percents: {
