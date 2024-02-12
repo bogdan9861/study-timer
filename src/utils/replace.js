@@ -1,8 +1,8 @@
 const replace = (el) => {
     if (typeof el !== String){
-        return String(el).replace(':', '')
+        return Number(String(el).replace(':', ''))
     } else {
-        return el.replace(':', '')
+        return Number(el.replace(':', '')) 
     }   
 }
 

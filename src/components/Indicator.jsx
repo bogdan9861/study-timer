@@ -1,80 +1,131 @@
-import { StyleSheet, Text, View } from "react-native"
+import { Pressable, StyleSheet, Text, View } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import { useEffect, useState } from "react"
 import { Dimensions } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import { setDuration } from "../slices/IndicatorSlice"
+import { setDuration, setRemainedToStart, setCurrentTime, setStartTime } from "../slices/IndicatorSlice"
 import { useNotifications } from "../utils/useNotifications"
 
-import replace from "../utils/replace";
+import StringToMinutes from "../utils/StringToMinutes"
 
 const Indicator = () => {
 
-    const { nowIndex, schedules, ended } = useSelector(state => state.main);
-    const { hourses, minutes } = useSelector(state => state.clock);
-    const { duration } = useSelector(state => state.indicator)
+    const { nowIndex, schedules, ended } = useSelector(state => state.main)
+    const { hourses, minutes } = useSelector(state => state.clock)
+    const { duration, remainedToStart, currentTime, startTime } = useSelector(state => state.indicator)
 
-    const [startHourse, setStartHourse] = useState(0);
-    const [startMinutes, setStartMinutes] = useState(0);
+    const [endTime, setEndTime] = useState(0)
+    const [nextMinutes, setNextMinutes] = useState(0)
 
-    const [endHourse, setEndHourse] = useState(0);
-    const [endMinutes, setEndMinutes] = useState(0);
-    const [remaining, setRemaining] = useState(0);
+    const [remained, setRemained] = useState(0)
 
-    const dispatch = useDispatch();
-    const notification = useNotifications();
+    const dispatch = useDispatch()
+    const notification = useNotifications()
 
     useEffect(() => {
-        setEndHourse(Number(schedules[nowIndex][1][0] + schedules[nowIndex][1][1]))
-        setEndMinutes(Number(schedules[nowIndex][1][3] + schedules[nowIndex][1][4]))
-
-        setStartHourse(Number(schedules[nowIndex][0][0] + schedules[nowIndex][0][1]))
-        setStartMinutes(Number(schedules[nowIndex][0][3] + schedules[nowIndex][0][4]))
-
-
-    }, [nowIndex, hourses, minutes, schedules])
-
-    const convertHourses = (num) => {
-        return num * 60;
-    }
+        dispatch(setCurrentTime(Number(hourses) * 60 + Number(minutes)))
+    }, [hourses, minutes])
 
     useEffect(() => {
-        setRemaining(Number((convertHourses(endHourse) + endMinutes) - (convertHourses(Number(hourses)) + Number(minutes))));
-        dispatch(setDuration((convertHourses(endHourse) + endMinutes) - (convertHourses(startHourse) + startMinutes)))
-    }, [endHourse, endMinutes, hourses, minutes, schedules])
+        const { StartTime, EndTime } = StringToMinutes(nowIndex, schedules)
+
+        dispatch(setStartTime(StartTime))
+        setEndTime(EndTime)
+    }, [currentTime])
+
 
     useEffect(() => {
 
-        let devidedTrigger = duration / 3;
+        setRemained(endTime - currentTime)
+        dispatch(setDuration(endTime - startTime))
 
-        console.log(Math.trunc(devidedTrigger));
+        let step = nowIndex + 1 < schedules.length ? 1 : 0
 
-        if (remaining % Math.floor(devidedTrigger) == 0) {
-            notification.sendNotification('Обратите внимание', `до завершения события осталось ${Math.trunc(remaining / 60)} ч. ${remaining % 60} м.`)
-                .then((res) => console.log(res))
-                .catch(e => console.log(e))
+        setNextMinutes(StringToMinutes(nowIndex + step, schedules).StartTime)
+
+        if (currentTime > endTime && currentTime < nextMinutes && schedules.length > 1) {
+            dispatch(setRemainedToStart(nextMinutes - currentTime))
+        } else if (nowIndex == 0 && currentTime < startTime) {
+            dispatch(setRemainedToStart(startTime - currentTime))
+        } else if (currentTime >= startTime && currentTime < endTime) {
+            dispatch(setRemainedToStart(0))
+        }
+    }, [currentTime, remained, remainedToStart, nowIndex])
+
+
+    useEffect(() => {
+
+        if (remainedToStart > 0 && remainedToStart % 10 == 0) {
+            notification.sendNotification(
+                'Обратите внимание',
+                `до начала события ${schedules[nowIndex][0]} - ${schedules[nowIndex][1]} осталось ${Math.trunc(remainedToStart / 60)}ч. ${remainedToStart % 60}м.`
+            )
         }
 
+        if (remainedToStart == 0 && remained % 10 == 0) {
+            notification.sendNotification(
+                'Обратите внимание',
+                `до завершения события ${schedules[nowIndex][0]} - ${schedules[nowIndex][1]} осталось ${Math.trunc(remained / 60)} ч. ${remained % 60} м.`
+            )
+        }
+    
 
-    }, [remaining])
+    }, [remained, remainedToStart, schedules, nowIndex])
+
+
+    const calcPercentsToEnd = () => {
+
+        if (remainedToStart > 0 && nowIndex > 0) {
+            return Math.floor(((currentTime - endTime) / (nextMinutes - endTime)) * 100);
+        } else if (nowIndex == 0 && currentTime < startTime && remainedToStart > 0) {
+            return undefined
+        } else {
+            return Math.floor(remained / duration * 100);
+        }
+
+    }
 
     return (
         !ended ?
             <View style={styles.indicator}>
-                <Text style={styles.indicator_title}>До конца:</Text>
-                <Text style={styles.indicator_time}>{Math.trunc(remaining / 60)}ч {remaining % 60}м</Text>
-                <View style={styles.indicator_inner}>
-                    <Text style={styles.indicator_percents}>{Math.floor(remaining / duration * 100)}%</Text>
-                    <View style={styles.indicator_parent}>
-                        <View style={styles.indicator_backlayer}></View>
-                        <View
-                            style={[
-                                styles.indicator_frontlayer,
-                                { width: duration != 0 ? Math.floor(remaining / duration * 100) + '%' : 0 }
-                            ]}
-                        />
-                    </View>
-                </View>
+                <Text style={styles.indicator_title}>
+                    {
+                        remainedToStart > 0 ? 'до начала:' : 'до конца:'
+                    }
+                </Text>
+                <Text style={[styles.indicator_time, calcPercentsToEnd() == undefined ? null : { marginBottom: hp('5%') }]}>
+                    {
+                        remainedToStart > 0
+                            ? `${Math.trunc(remainedToStart / 60)}ч ${remainedToStart % 60}м`
+                            : `${Math.trunc(remained / 60)}ч ${remained % 60}м`
+                    }
+                </Text>
+                {
+                    calcPercentsToEnd() == undefined ? null :
+                        <View>
+                            <View style={styles.indicator_inner}>
+                                <Text style={styles.indicator_percents}>
+                                    {calcPercentsToEnd() + '%'}
+                                </Text>
+
+                                <View style={styles.indicator_parent}>
+                                    <View style={styles.indicator_backlayer}></View>
+                                    <View
+                                        style={[
+                                            styles.indicator_frontlayer,
+                                            {
+                                                width: remainedToStart > 0
+                                                    ? calcPercentsToEnd() + '%'
+                                                    : duration != 0 ? Math.floor(remained / duration * 100) + '%' : 0
+                                            }
+                                        ]}
+                                    />
+                                </View>
+
+                            </View>
+                        </View>
+                }
+
             </View>
             : null
     )
@@ -94,7 +145,6 @@ const styles = StyleSheet.create({
         fontSize: 60,
         fontWeight: '800',
         textAlign: 'center',
-        marginBottom: 35,
     },
 
     indicator_inner: {

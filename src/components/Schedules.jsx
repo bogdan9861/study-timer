@@ -6,6 +6,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { addFormatedTime, addNowIndex, toggleEnded } from '../slices/MainSlice'
 import Clock from './Clock'
 
+import StringToMinutes from '../utils/StringToMinutes'
 import replace from '../utils/replace'
 import AddZero from '../utils/AddZero'
 
@@ -13,27 +14,27 @@ const Schedules = ({ navigation }) => {
 
     const { hourses, minutes } = useSelector(state => state.clock);
     const { schedules, formatedTime, nowIndex, ended } = useSelector(state => state.main);
-    const { duration } = useSelector(state => state.indicator)
+    const { duration, currentTime, startTime } = useSelector(state => state.indicator)
 
     const dispatch = useDispatch();
 
+
     useEffect(() => {
+        schedules.forEach((el, i) => {
+            const { StartTime, EndTime } = StringToMinutes(i, schedules);
 
-        dispatch(addFormatedTime(Number(replace(`${AddZero(hourses)}:${AddZero(minutes)}`))))
-
-        schedules.forEach((time, i) => {
-            if (formatedTime >= Number(replace(time[0])) && formatedTime < Number(replace(time[1]))) {
+            if (currentTime >= StartTime && currentTime < EndTime) {
                 dispatch(addNowIndex(i));
             }
         })
 
-        if (formatedTime > Number(replace(schedules[schedules.length - 1][1]))) {
+        if (currentTime >= StringToMinutes(schedules.length - 1, schedules).EndTime) {
             dispatch(toggleEnded(true));
         } else {
             dispatch(toggleEnded(false));
         }
 
-    }, [formatedTime, schedules, hourses, minutes])
+    }, [schedules, hourses, minutes, nowIndex])
 
     const Redirect = (path) => {
         navigation.navigate(path, { name: path })
@@ -60,7 +61,7 @@ const Schedules = ({ navigation }) => {
             <ScrollView style={styles.main_scroll}>
                 {
                     schedules.map((time, i) => {
-                        let now = nowIndex == i;
+                        let now = nowIndex == i && currentTime >= startTime;
                         if (ended) return;
                         return (
                             <View

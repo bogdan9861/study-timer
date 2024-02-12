@@ -14,7 +14,6 @@ const Footer = () => {
 const styles = StyleSheet.create({
     footer: {
         position: 'absolute',
-        // bottom: Dimensions.get('window').width > 500 ? hp('0%') : hp('0%'),
         top: hp('87%'),
         width: wp('100%'),
         zIndex: -1

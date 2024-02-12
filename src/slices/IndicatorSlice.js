@@ -2,7 +2,10 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   timeInterval: [],
-  duration: 0
+  duration: 0,
+  remainedToStart: 0,
+  currentTime: 0,
+  startTime: 0,
 }
 
 const IndicatorSlice = createSlice({
@@ -15,6 +18,18 @@ const IndicatorSlice = createSlice({
 
     setDuration: (state, action) => {
       state.duration = action.payload
+    },
+
+    setRemainedToStart: (state, action) => {
+      state.remainedToStart = action.payload;
+    },
+
+    setCurrentTime: (state, action) => {
+      state.currentTime = action.payload
+    },
+
+    setStartTime: (state, action) => {
+      state.startTime = action.payload
     }
   },
 })
@@ -24,5 +39,8 @@ export default reducer;
 
 export const {
   addTimeInterval,
-  setDuration
+  setDuration,
+  setRemainedToStart,
+  setCurrentTime,
+  setStartTime
 } = actions;

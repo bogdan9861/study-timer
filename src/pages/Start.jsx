@@ -68,13 +68,10 @@ const Start = ({ navigation }) => {
 
         dispatch(addNowIndex(0))
         dispatch(addFormatedTime(''))
-        dispatch(addSchedules(scheduleArr));
+        dispatch(addSchedules(scheduleArr))
         Redirect('Main');
     }
 
-    useEffect(() => {
-
-    }, [])
 
     return (
         <View style={styles.start}>
