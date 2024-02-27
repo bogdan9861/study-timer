@@ -16,34 +16,34 @@ const Stack = createNativeStackNavigator();
 export default function App() {
 
   return (
-    <Provider store={Store}>
-      <Container>
-        <Stack.Navigator>
-          <Stack.Screen
-            name='Start'
-            component={Start}
-            options={{
-              headerShown: false
-            }}
-          />
-          <Stack.Screen
-            name='CreateSchedule'
-            component={CreateSchedule}
-            options={{
-              headerShown: false
-            }}
-          />
-          <Stack.Screen
-            name='Main'
-            component={Main}
+      <Provider store={Store}>
+        <Container>
+          <Stack.Navigator>
+            <Stack.Screen
+              name='Start'
+              component={Start}
+              options={{
+                headerShown: false
+              }}
+            />
+            <Stack.Screen
+              name='CreateSchedule'
+              component={CreateSchedule}
+              options={{
+                headerShown: false
+              }}
+            />
+            <Stack.Screen
+              name='Main'
+              component={Main}
 
-            options={{
-              headerShown: false
-            }}
-          />
-        </Stack.Navigator>
-      </Container>
-    </Provider>
+              options={{
+                headerShown: false
+              }}
+            />
+          </Stack.Navigator>
+        </Container>
+      </Provider>
   )
 }
 

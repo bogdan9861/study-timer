@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from "react-redux"
 import { useEffect, useState } from "react"
 import { Dimensions } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
-import { setDuration, setRemainedToStart, setCurrentTime, setStartTime } from "../slices/IndicatorSlice"
-import { useNotifications } from "../utils/useNotifications"
 
+import { setDuration, setRemainedToStart, setCurrentTime, setStartTime } from "../slices/IndicatorSlice"
+
+import { useNotifications } from "../utils/useNotifications"
 import StringToMinutes from "../utils/StringToMinutes"
 
 const Indicator = () => {
@@ -13,7 +14,7 @@ const Indicator = () => {
     const { nowIndex, schedules, ended } = useSelector(state => state.main)
     const { hourses, minutes } = useSelector(state => state.clock)
     const { duration, remainedToStart, currentTime, startTime } = useSelector(state => state.indicator)
-    const { loading } = useSelector(state => state.start)
+    const { timeInterval } = useSelector(state => state.settings)
 
     const [endTime, setEndTime] = useState(0)
     const [nextMinutes, setNextMinutes] = useState(0)
@@ -60,16 +61,14 @@ const Indicator = () => {
 
     useEffect(() => {
 
-        const toStart_notification_trigger = Math.floor(remainedToStart / 3);
-
-        if (remainedToStart > 0 && remainedToStart % toStart_notification_trigger == 0 && !ended) {
+        if (remainedToStart > 0 && remainedToStart % timeInterval == 0 && !ended) {
             notification.sendNotification(
                 'Обратите внимание',
                 `до начала события ${schedules[nowIndex][0]} - ${schedules[nowIndex][1]} осталось ${Math.trunc(remainedToStart / 60)}ч. ${remainedToStart % 60}м.`
             )
         }
 
-        if (remainedToStart == 0 && remained % 15 == 0 && !ended) {
+        if (remainedToStart == 0 && duration % timeInterval == 0 && !ended) {
             notification.sendNotification(
                 'Обратите внимание',
                 `до завершения события ${schedules[nowIndex][0]} - ${schedules[nowIndex][1]} осталось ${Math.trunc(remained / 60)} ч. ${remained % 60} м.`
@@ -77,7 +76,7 @@ const Indicator = () => {
         }
 
 
-    }, [remained, remainedToStart, schedules, nowIndex])
+    }, [remained, remainedToStart, schedules, nowIndex, timeInterval])
 
 
     const calcPercentsToEnd = () => {

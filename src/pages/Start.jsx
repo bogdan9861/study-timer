@@ -1,17 +1,18 @@
 import { useEffect } from 'react'
 import { View, Text, Pressable, ScrollView, StyleSheet, Image, ActivityIndicator, Dimensions } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { addSchedules, addNowIndex, addFormatedTime } from '../slices/MainSlice'
-import { addScheduleListItem, changeLoading, removeSchedule } from '../slices/StartSlice'
-import { getData, getAllDataKeys, deleteData } from '../utils/AsyncData'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
-import Footer from '../components/Footer'
+import { addSchedules, addNowIndex, addFormatedTime } from '../slices/MainSlice'
+import { addScheduleListItem, changeLoading, removeSchedule } from '../slices/StartSlice'
 
+import { getData, getAllDataKeys, deleteData } from '../utils/AsyncData'
+
+import Footer from '../components/Footer'
 import Head from '../components/Head'
 import bin from '../assets/bin.png'
 import arrow from '../assets/arrow.png'
-
+import Settings from '../components/Settings'
 
 const Start = ({ navigation }) => {
 
@@ -65,6 +66,7 @@ const Start = ({ navigation }) => {
 
     return (
         <View style={styles.start}>
+            <Settings />
             <Head />
             <Text style={styles.start_title}>
                 {
