@@ -52,8 +52,9 @@ const CreateSchedule = ({ navigation }) => {
     }, [startTime, endTime])
 
     const setDots = (str, setStr) => {
-        if (str.length == 2) {
-            setStr(str + ":")
+
+        if (str.length == 4 && str[str.indexOf(':', 0)] != ':') {
+            setStr(str[0] + str[1] + ':' + str[2] + str[3])
         }
     }
 
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
 
         maxWidth: wp('60%'),
         marginTop: hp('8%'),
-        marginBottom: hp('8%'),
+        marginBottom: hp('5%'),
     },
 
     form: {
@@ -281,8 +282,8 @@ const styles = StyleSheet.create({
     },
 
     create_list: {
-        height: hp('20%'),
-        marginBottom: Dimensions.get('window').height > 895 ? hp('0%') : hp('0%'),
+        height: hp('15%'),
+        marginBottom: hp('5%')
     },
 
     create_list_item: {

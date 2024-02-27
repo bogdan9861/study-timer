@@ -16,7 +16,6 @@ const Stack = createNativeStackNavigator();
 export default function App() {
 
   return (
-
     <Provider store={Store}>
       <Container>
         <Stack.Navigator>

@@ -4,7 +4,7 @@ const initialState = {
     schedules: [],
     formatedTime: '',
     nowIndex: 0,
-    ended: false
+    ended: false,
 }
 
 const MainSlice = createSlice({

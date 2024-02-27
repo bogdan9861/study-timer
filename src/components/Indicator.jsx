@@ -13,6 +13,7 @@ const Indicator = () => {
     const { nowIndex, schedules, ended } = useSelector(state => state.main)
     const { hourses, minutes } = useSelector(state => state.clock)
     const { duration, remainedToStart, currentTime, startTime } = useSelector(state => state.indicator)
+    const { loading } = useSelector(state => state.start)
 
     const [endTime, setEndTime] = useState(0)
     const [nextMinutes, setNextMinutes] = useState(0)
@@ -21,6 +22,7 @@ const Indicator = () => {
 
     const dispatch = useDispatch()
     const notification = useNotifications()
+
 
     useEffect(() => {
         dispatch(setCurrentTime(Number(hourses) * 60 + Number(minutes)))
@@ -36,48 +38,53 @@ const Indicator = () => {
 
     useEffect(() => {
 
-        setRemained(endTime - currentTime)
+        setRemained(remained => endTime - currentTime)
         dispatch(setDuration(endTime - startTime))
 
         let step = nowIndex + 1 < schedules.length ? 1 : 0
 
         setNextMinutes(StringToMinutes(nowIndex + step, schedules).StartTime)
 
-        if (currentTime > endTime && currentTime < nextMinutes && schedules.length > 1) {
+        console.log(nowIndex == 0 && currentTime < startTime);
+
+        if (currentTime >= endTime && currentTime < nextMinutes && schedules.length > 1) {
             dispatch(setRemainedToStart(nextMinutes - currentTime))
         } else if (nowIndex == 0 && currentTime < startTime) {
             dispatch(setRemainedToStart(startTime - currentTime))
         } else if (currentTime >= startTime && currentTime < endTime) {
             dispatch(setRemainedToStart(0))
         }
-    }, [currentTime, remained, remainedToStart, nowIndex])
+
+    }, [currentTime, endTime, remained, remainedToStart, nowIndex])
 
 
     useEffect(() => {
 
-        if (remainedToStart > 0 && remainedToStart % 10 == 0) {
+        const toStart_notification_trigger = Math.floor(remainedToStart / 3);
+
+        if (remainedToStart > 0 && remainedToStart % toStart_notification_trigger == 0 && !ended) {
             notification.sendNotification(
                 'Обратите внимание',
                 `до начала события ${schedules[nowIndex][0]} - ${schedules[nowIndex][1]} осталось ${Math.trunc(remainedToStart / 60)}ч. ${remainedToStart % 60}м.`
             )
         }
 
-        if (remainedToStart == 0 && remained % 10 == 0) {
+        if (remainedToStart == 0 && remained % 15 == 0 && !ended) {
             notification.sendNotification(
                 'Обратите внимание',
                 `до завершения события ${schedules[nowIndex][0]} - ${schedules[nowIndex][1]} осталось ${Math.trunc(remained / 60)} ч. ${remained % 60} м.`
             )
         }
-    
+
 
     }, [remained, remainedToStart, schedules, nowIndex])
 
 
     const calcPercentsToEnd = () => {
 
-        if (remainedToStart > 0 && nowIndex > 0) {
+        if (remainedToStart > 0 && schedules.length > 1 && currentTime > endTime) {
             return Math.floor(((currentTime - endTime) / (nextMinutes - endTime)) * 100);
-        } else if (nowIndex == 0 && currentTime < startTime && remainedToStart > 0) {
+        } else if (nowIndex == 0 && currentTime < startTime) {
             return undefined
         } else {
             return Math.floor(remained / duration * 100);

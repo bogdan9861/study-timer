@@ -23,16 +23,6 @@ const Start = ({ navigation }) => {
         navigation.navigate(path, { name: path })
     }
 
-    const deleteAllData = () => {
-        getAllDataKeys()
-            .then((res) => deleteDataByKeys(res))
-            .catch(e => console.log(e))
-
-        function deleteDataByKeys(keys) {
-            keys.forEach(key => deleteData(`${key}`))
-        }
-    }
-
     const deleteScheduleFromList = (i) => {
         deleteData(`${ScheduleController[i].id}`)
         dispatch(removeSchedule(i));
@@ -89,16 +79,18 @@ const Start = ({ navigation }) => {
                         ScheduleController.map((el, i) => {
                             return (
                                 <View style={styles.list_item} key={i}>
+
+                                    <Text style={styles.item_name}>{i + 1}. {el.name}</Text>
+
                                     <View style={styles.item_inner}>
-                                        <Text style={styles.item_name}>{i + 1}. {el.name}</Text>
                                         <Pressable style={styles.delete} onPress={() => deleteScheduleFromList(i)}>
                                             <Image source={bin} />
                                         </Pressable>
-                                    </View>
 
-                                    <Pressable style={styles.next} onPress={() => redirectWithChedule(i)}>
-                                        <Image source={arrow} />
-                                    </Pressable>
+                                        <Pressable style={styles.next} onPress={() => redirectWithChedule(i)}>
+                                            <Image source={arrow} />
+                                        </Pressable>
+                                    </View>
                                 </View>
                             )
                         })
@@ -110,7 +102,7 @@ const Start = ({ navigation }) => {
             >
                 <Text>Добавить</Text>
             </Pressable>
-            <Footer/>
+            <Footer />
         </View>
     )
 }
@@ -125,11 +117,12 @@ const styles = StyleSheet.create({
     },
 
     list: {
-        marginTop: 84,
+        marginTop: hp('4%'),
+        marginBottom: hp('5%'),
         marginLeft: 'auto',
         marginRight: 'auto',
-        width: 390,
-        height: 300,
+        width: wp('93%'),
+        height: hp('40%'),
     },
 
     list_item: {
@@ -158,7 +151,7 @@ const styles = StyleSheet.create({
         borderRadius: 35,
         alignItems: 'center',
         justifyContent: 'center',
-        marginLeft: 20,
+        marginRight: wp('2%'),
     },
 
     next: {
@@ -178,9 +171,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 10,
-        marginRight: 10,
-        marginTop: 50,
-        marginBottom: 180
     },
 });
 

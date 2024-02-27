@@ -3,12 +3,10 @@ import { View, StyleSheet, Text, ScrollView, Image, Pressable } from 'react-nati
 import { useSelector, useDispatch } from 'react-redux'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
-import { addFormatedTime, addNowIndex, toggleEnded } from '../slices/MainSlice'
+import { addNowIndex, toggleEnded } from '../slices/MainSlice'
 import Clock from './Clock'
 
 import StringToMinutes from '../utils/StringToMinutes'
-import replace from '../utils/replace'
-import AddZero from '../utils/AddZero'
 
 const Schedules = ({ navigation }) => {
 
@@ -20,11 +18,14 @@ const Schedules = ({ navigation }) => {
 
 
     useEffect(() => {
+
         schedules.forEach((el, i) => {
             const { StartTime, EndTime } = StringToMinutes(i, schedules);
 
             if (currentTime >= StartTime && currentTime < EndTime) {
                 dispatch(addNowIndex(i));
+            } else if (schedules.length > 1) {
+                dispatch(addNowIndex(schedules.length - 2))
             }
         })
 
@@ -34,7 +35,7 @@ const Schedules = ({ navigation }) => {
             dispatch(toggleEnded(false));
         }
 
-    }, [schedules, hourses, minutes, nowIndex])
+    }, [hourses, minutes, schedules])
 
     const Redirect = (path) => {
         navigation.navigate(path, { name: path })
@@ -42,7 +43,6 @@ const Schedules = ({ navigation }) => {
 
     return (
         <View style={styles.main}>
-
             {
                 !ended
                     ?
