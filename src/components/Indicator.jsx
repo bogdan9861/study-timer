@@ -5,6 +5,7 @@ import { Dimensions } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
 import { setDuration, setRemainedToStart, setCurrentTime, setStartTime } from "../slices/IndicatorSlice"
+import { applyTimeInterval } from "../slices/SettingsSlice"
 
 import { useNotifications } from "../utils/useNotifications"
 import StringToMinutes from "../utils/StringToMinutes"
@@ -18,12 +19,10 @@ const Indicator = () => {
 
     const [endTime, setEndTime] = useState(0)
     const [nextMinutes, setNextMinutes] = useState(0)
-
     const [remained, setRemained] = useState(0)
 
     const dispatch = useDispatch()
     const notification = useNotifications()
-
 
     useEffect(() => {
         dispatch(setCurrentTime(Number(hourses) * 60 + Number(minutes)))
@@ -46,8 +45,6 @@ const Indicator = () => {
 
         setNextMinutes(StringToMinutes(nowIndex + step, schedules).StartTime)
 
-        console.log(nowIndex == 0 && currentTime < startTime);
-
         if (currentTime >= endTime && currentTime < nextMinutes && schedules.length > 1) {
             dispatch(setRemainedToStart(nextMinutes - currentTime))
         } else if (nowIndex == 0 && currentTime < startTime) {
@@ -56,7 +53,7 @@ const Indicator = () => {
             dispatch(setRemainedToStart(0))
         }
 
-    }, [currentTime, endTime, remained, remainedToStart, nowIndex])
+    }, [currentTime, endTime, remained, remainedToStart, nowIndex, schedules])
 
 
     useEffect(() => {
@@ -74,7 +71,6 @@ const Indicator = () => {
                 `до завершения события ${schedules[nowIndex][0]} - ${schedules[nowIndex][1]} осталось ${Math.trunc(remained / 60)} ч. ${remained % 60} м.`
             )
         }
-
 
     }, [remained, remainedToStart, schedules, nowIndex, timeInterval])
 

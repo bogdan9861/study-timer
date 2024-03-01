@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 import { applyTimeInterval } from '../slices/SettingsSlice'
 
 import settings from '../assets/settings.png'
+import close from '../assets/close.png'
 
 const Settings = () => {
 
@@ -20,16 +21,24 @@ const Settings = () => {
 
     const applySettings = () => {
         timeInterval > 0 ? dispatch(applyTimeInterval(timeInterval)) : alert('интервал не может быть равень нулю!')
-        timeInterval < 1439 ? dispatch(applyTimeInterval(timeInterval)) : alert('интервал не может быть больше 23 часов 59 минут!')
+        timeInterval <= 1439 ? dispatch(applyTimeInterval(timeInterval)) : alert('интервал не может быть больше 23 часов 59 минут!')
 
-        Keyboard.dismiss();
-        setOppen(false)
+        if (timeInterval > 0 && timeInterval <= 1439) {
+            Keyboard.dismiss();
+            setOppen(false)
+        }
     }
 
     return (
         <Pressable style={styles.settings} onPress={() => Keyboard.dismiss()}>
             <Pressable style={styles.settings_btn} onPress={toggleDisplay}>
-                <Image style={styles.settings_img} source={settings} />
+                {
+                    !oppen
+                        ?
+                        <Image style={styles.settings_img} source={settings} />
+                        :
+                        <Image style={styles.settings_img} source={close} />
+                }
             </Pressable>
             <View style={[styles.settings_list, { display: oppen ? 'block' : 'none' }]}>
                 <View style={styles.settings_content_item}>
@@ -60,6 +69,8 @@ const styles = StyleSheet.create({
         zIndex: 10,
         top: hp('5%'),
         left: wp('6%'),
+        padding: 5,
+        borderRadius: 6
     },
 
     settings_list: {
@@ -91,13 +102,13 @@ const styles = StyleSheet.create({
 
     settings_input: {
         paddingVertical: 7,
-        paddingHorizontal: 10,
+        paddingLeft: 10,
         height: 40,
         backgroundColor: '#c4c4c4',
         borderRadius: 5,
         marginBottom: 15,
         color: '#fff',
-        fontWeight: '600'
+        fontWeight: '600',
     },
 
     settings_item_btn: {

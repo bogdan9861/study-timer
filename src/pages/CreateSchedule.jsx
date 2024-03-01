@@ -10,7 +10,7 @@ import {
 } from "react-native"
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { saveData } from '../utils/AsyncData';
+import { saveData, deleteData } from '../utils/AsyncData';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
 import replace from '../utils/replace'
@@ -19,12 +19,13 @@ import Alert from "../utils/Alert";
 import Head from '../components/Head'
 import bin from '../assets/bin.png';
 
-import { addScheduleListItem } from "../slices/StartSlice";
+import { addScheduleListItem, removeSchedule } from "../slices/StartSlice";
 import Footer from "../components/Footer";
 
 const CreateSchedule = ({ navigation }) => {
 
     const scheduleController = useSelector(state => state.start.ScheduleController);
+    const { edited } = useSelector(state => state.edit);
 
     const [scheduleName, setScheduleName] = useState('');
     const [startTime, setStartTime] = useState('');
@@ -38,6 +39,21 @@ const CreateSchedule = ({ navigation }) => {
     const EndInput = useRef(null);
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (edited != null) {
+            setScheduleName(scheduleController[edited].name);
+
+            let ArrForEdit = [];
+
+            for (i in Object.keys(scheduleController[edited].schedules)) {
+                ArrForEdit.push(scheduleController[edited].schedules[i]);
+            }
+
+            setLocalSchedules(ArrForEdit);
+        }
+    }, [edited])
+
 
     useEffect(() => {
         setDisabled(localSchedules.length == 0);
@@ -98,19 +114,28 @@ const CreateSchedule = ({ navigation }) => {
 
         let id = scheduleController.length;
         let name = scheduleName;
-
         let newScheduleInfo = { name, schedules: localSchedules, id };
-
         let covertedSchedule = {};
 
         localSchedules.forEach((el, i) => {
             covertedSchedule[i] = el;
         })
 
-        let newConvertedScheduleInfo = { id, name, schedules: covertedSchedule }
 
-        saveData(`${id}`, JSON.stringify(newConvertedScheduleInfo));
-        dispatch(addScheduleListItem(newScheduleInfo));
+        if (edited == null) {
+            let newConvertedScheduleInfo = { id, name, schedules: covertedSchedule }
+
+            saveData(`${id}`, JSON.stringify(newConvertedScheduleInfo));
+            dispatch(addScheduleListItem(newScheduleInfo));
+        } else {
+            let editedScheduleInfo = { id: edited, name, schedules: covertedSchedule }
+
+            deleteData(`${edited}`)
+            dispatch(removeSchedule(edited))
+
+            dispatch(addScheduleListItem(editedScheduleInfo));
+            saveData(`${edited}`, JSON.stringify(editedScheduleInfo))
+        }
 
         navigation.navigate('Start', { name: 'Start' })
     }
@@ -130,6 +155,7 @@ const CreateSchedule = ({ navigation }) => {
                         style={[styles.input, styles.input_name]}
                         placeholder="введите название"
                         placeholderTextColor="#fff"
+                        value={scheduleName}
                         onChangeText={setScheduleName}
                     />
                     <Pressable style={styles.input_btn} onPress={() => StartInput.current.focus()}>

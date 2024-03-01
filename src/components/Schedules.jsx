@@ -19,6 +19,7 @@ const Schedules = ({ navigation }) => {
 
     useEffect(() => {
 
+
         schedules.forEach((el, i) => {
             const { StartTime, EndTime } = StringToMinutes(i, schedules);
 

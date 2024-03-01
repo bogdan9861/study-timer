@@ -5,9 +5,10 @@ import main from '../slices/MainSlice'
 import indicator from '../slices/IndicatorSlice'
 import start from '../slices/StartSlice'
 import settings from '../slices/SettingsSlice'
+import edit from '../slices/EditSlice'
 
 const Store = configureStore({
-    reducer: { clock, main, indicator, start, settings },
+    reducer: { clock, main, indicator, start, settings, edit },
     middleware: getDefaultMiddleware => getDefaultMiddleware({
         immutableCheck: false,
         serializableCheck: false,

@@ -1,5 +1,3 @@
-
-
 const StringToMinutes = (nowIndex, schedules) => {
     const startHourse  = Number(schedules[nowIndex][0][0] + schedules[nowIndex][0][1])
     const startMinutes = Number(schedules[nowIndex][0][3] + schedules[nowIndex][0][4])

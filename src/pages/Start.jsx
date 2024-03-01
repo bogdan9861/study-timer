@@ -5,14 +5,18 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 import { addSchedules, addNowIndex, addFormatedTime } from '../slices/MainSlice'
 import { addScheduleListItem, changeLoading, removeSchedule } from '../slices/StartSlice'
+import { setEditedId } from '../slices/EditSlice'
 
 import { getData, getAllDataKeys, deleteData } from '../utils/AsyncData'
 
 import Footer from '../components/Footer'
 import Head from '../components/Head'
+
+import Settings from '../components/Settings'
 import bin from '../assets/bin.png'
 import arrow from '../assets/arrow.png'
-import Settings from '../components/Settings'
+import edit from '../assets/edit.png'
+import { useCallback } from 'react'
 
 const Start = ({ navigation }) => {
 
@@ -22,6 +26,18 @@ const Start = ({ navigation }) => {
 
     const Redirect = (path) => {
         navigation.navigate(path, { name: path })
+    }
+
+    const deleteAllData = () => {
+        getAllDataKeys()
+            .then((res) => removeAllKeys(res))
+            .catch(e => console.log(e))
+
+        const removeAllKeys = (res) => {
+            res.forEach(key => {
+                deleteData(key)
+            })
+        }
     }
 
     const deleteScheduleFromList = (i) => {
@@ -47,7 +63,6 @@ const Start = ({ navigation }) => {
 
     }, [])
 
-
     const redirectWithChedule = (index) => {
         let scheduleArr = [];
 
@@ -63,6 +78,17 @@ const Start = ({ navigation }) => {
         Redirect('Main');
     }
 
+    const redirectToEdit = (i) => {
+        dispatch(setEditedId(i));
+
+        Redirect('CreateSchedule');
+    }
+
+    const onCreateSchedule = () => {
+        Redirect('CreateSchedule');
+
+        dispatch(setEditedId(null));
+    }
 
     return (
         <View style={styles.start}>
@@ -85,11 +111,15 @@ const Start = ({ navigation }) => {
                                     <Text style={styles.item_name}>{i + 1}. {el.name}</Text>
 
                                     <View style={styles.item_inner}>
-                                        <Pressable style={styles.delete} onPress={() => deleteScheduleFromList(i)}>
+                                        <Pressable style={[styles.item_btn, styles.edit]} onPress={() => redirectToEdit(i)}>
+                                            <Image source={edit} />
+                                        </Pressable>
+
+                                        <Pressable style={[styles.item_btn, styles.delete]} onPress={() => deleteScheduleFromList(i)}>
                                             <Image source={bin} />
                                         </Pressable>
 
-                                        <Pressable style={styles.next} onPress={() => redirectWithChedule(i)}>
+                                        <Pressable style={[styles.item_btn, styles.next]} onPress={() => redirectWithChedule(i)}>
                                             <Image source={arrow} />
                                         </Pressable>
                                     </View>
@@ -100,7 +130,7 @@ const Start = ({ navigation }) => {
             </ScrollView>
             <Pressable
                 style={styles.add}
-                onPress={() => Redirect('CreateSchedule')}
+                onPress={() => onCreateSchedule()}
             >
                 <Text>Добавить</Text>
             </Pressable>
@@ -147,22 +177,26 @@ const styles = StyleSheet.create({
     },
 
     delete: {
-        width: 35,
-        height: 35,
         backgroundColor: '#E38663',
-        borderRadius: 35,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: wp('2%'),
     },
 
     next: {
+        backgroundColor: '#F5D99A',
+    },
+
+    edit: {
+        backgroundColor: '#91C300'
+    },
+
+    item_btn: {
         width: 35,
         height: 35,
-        backgroundColor: '#F5D99A',
+
         borderRadius: 35,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+
+        marginHorizontal: wp('1%')
     },
 
     add: {
