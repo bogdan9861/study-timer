@@ -23,10 +23,12 @@ const Schedules = ({ navigation }) => {
         schedules.forEach((el, i) => {
             const { StartTime, EndTime } = StringToMinutes(i, schedules);
 
+            console.log(currentTime >= StartTime);
+
             if (currentTime >= StartTime && currentTime < EndTime) {
                 dispatch(addNowIndex(i));
-            } else if (schedules.length > 1) {
-                dispatch(addNowIndex(schedules.length - 2))
+            } else if (currentTime >= StartTime) {
+                dispatch(addNowIndex(i))
             }
         })
 

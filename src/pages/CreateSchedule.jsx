@@ -25,7 +25,7 @@ import Footer from "../components/Footer";
 const CreateSchedule = ({ navigation }) => {
 
     const scheduleController = useSelector(state => state.start.ScheduleController);
-    const { edited } = useSelector(state => state.edit);
+    const { edited } = useSelector(state => state.start);
 
     const [scheduleName, setScheduleName] = useState('');
     const [startTime, setStartTime] = useState('');
@@ -140,13 +140,23 @@ const CreateSchedule = ({ navigation }) => {
         navigation.navigate('Start', { name: 'Start' })
     }
 
+    const getInterval = (start, end) => {
+        setTimeArr([start, end])
+        setStartTime(start)
+        setEndTime(end)
+    }
+
     return (
         <View style={styles.create}>
             <Head />
             <View style={styles.create_title_wrapper}>
                 <Text style={styles.create_title}>
-                    Введите
-                    расписание
+                    {edited != null ?
+                        'Измените рассписание'
+                        :
+                        'Введите расписание'
+                    }
+
                 </Text>
             </View>
             <View style={styles.form}>
@@ -203,12 +213,12 @@ const CreateSchedule = ({ navigation }) => {
                     {
                         localSchedules.map((time, i) => {
                             return (
-                                <View style={styles.create_list_item} key={i}>
+                                <Pressable onPress={() => getInterval(time[0], time[1])} style={styles.create_list_item} key={i}>
                                     <Text style={styles.item_text}>{time[0]} - {time[1]}</Text>
                                     <Pressable style={styles.item_delete} onPressIn={() => removeTimeInterval(i)}>
                                         <Image style={styles.item_delete_img} source={bin} />
                                     </Pressable>
-                                </View>
+                                </Pressable>
                             )
                         })
                     }
@@ -261,12 +271,12 @@ const styles = StyleSheet.create({
     input_wrapper: {
         position: 'relative',
         marginBottom: 0,
+        maxWidth: 285
     },
 
     input_name: {
         width: '100%',
         marginBottom: 15,
-
     },
 
     input: {

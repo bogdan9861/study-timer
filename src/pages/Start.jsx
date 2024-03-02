@@ -1,11 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { View, Text, Pressable, ScrollView, StyleSheet, Image, ActivityIndicator, Dimensions } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
 import { addSchedules, addNowIndex, addFormatedTime } from '../slices/MainSlice'
-import { addScheduleListItem, changeLoading, removeSchedule } from '../slices/StartSlice'
-import { setEditedId } from '../slices/EditSlice'
+import { addScheduleListItem, changeLoading, removeSchedule, setEditedId } from '../slices/StartSlice'
 
 import { getData, getAllDataKeys, deleteData } from '../utils/AsyncData'
 
@@ -16,7 +15,7 @@ import Settings from '../components/Settings'
 import bin from '../assets/bin.png'
 import arrow from '../assets/arrow.png'
 import edit from '../assets/edit.png'
-import { useCallback } from 'react'
+
 
 const Start = ({ navigation }) => {
 
@@ -90,6 +89,8 @@ const Start = ({ navigation }) => {
         dispatch(setEditedId(null));
     }
 
+
+
     return (
         <View style={styles.start}>
             <Settings />
@@ -108,15 +109,15 @@ const Start = ({ navigation }) => {
                             return (
                                 <View style={styles.list_item} key={i}>
 
-                                    <Text style={styles.item_name}>{i + 1}. {el.name}</Text>
+                                    <Text style={styles.item_name}>{i + 1}. {el.name.length > 17 ? `${el.name.slice(0, 17)}...` : el.name}</Text>
 
                                     <View style={styles.item_inner}>
-                                        <Pressable style={[styles.item_btn, styles.edit]} onPress={() => redirectToEdit(i)}>
-                                            <Image source={edit} />
-                                        </Pressable>
-
                                         <Pressable style={[styles.item_btn, styles.delete]} onPress={() => deleteScheduleFromList(i)}>
                                             <Image source={bin} />
+                                        </Pressable>
+
+                                        <Pressable style={[styles.item_btn, styles.edit]} onPress={() => redirectToEdit(i)}>
+                                            <Image source={edit} />
                                         </Pressable>
 
                                         <Pressable style={[styles.item_btn, styles.next]} onPress={() => redirectWithChedule(i)}>
@@ -142,19 +143,23 @@ const Start = ({ navigation }) => {
 const styles = StyleSheet.create({
 
     start_title: {
-        fontSize: hp('4%'),
+        fontSize: wp('9%'),
         fontWeight: '700',
         textAlign: 'center',
         marginTop: 35,
     },
 
     list: {
-        marginTop: hp('4%'),
+        marginTop: hp('10%'),
         marginBottom: hp('5%'),
         marginLeft: 'auto',
         marginRight: 'auto',
-        width: wp('93%'),
-        height: hp('40%'),
+
+        paddingLeft: 15,
+        paddingRight: 15,
+
+        width: wp('98%'),
+        height: hp('35%'),
     },
 
     list_item: {
@@ -173,7 +178,7 @@ const styles = StyleSheet.create({
 
     item_name: {
         fontSize: 20,
-        width: 280,
+        width: 250
     },
 
     delete: {

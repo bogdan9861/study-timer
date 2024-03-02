@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     ScheduleController: [],
     loading: false,
+    edited: null
 }
 
 const StartSlice = createSlice({
@@ -31,6 +32,10 @@ const StartSlice = createSlice({
 
         removeSchedule: (state, action) => {
             state.ScheduleController.splice(action.payload, 1)
+        },
+
+        setEditedId: (state, action) => {
+            state.edited = action.payload;
         }
     },
 })
@@ -44,5 +49,6 @@ export const {
     setScheduleName,
     changeItemId,
     changeLoading,
-    removeSchedule
+    removeSchedule,
+    setEditedId
 } = actions;

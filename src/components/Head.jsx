@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   header_logo: {
     position: 'absolute',
     top: '25%',
-    left: Dimensions.get('window').width > 500 ? wp('25%') : wp('15%'),
+    left: Dimensions.get('window').width > 500 ? wp('23%') : wp('13%'),
   }
 })
 

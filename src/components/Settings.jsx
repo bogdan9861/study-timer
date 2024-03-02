@@ -67,8 +67,8 @@ const styles = StyleSheet.create({
     settings_btn: {
         position: 'absolute',
         zIndex: 10,
-        top: hp('5%'),
-        left: wp('6%'),
+        top: hp('5.5%'),
+        right: wp('3%'),
         padding: 5,
         borderRadius: 6
     },
